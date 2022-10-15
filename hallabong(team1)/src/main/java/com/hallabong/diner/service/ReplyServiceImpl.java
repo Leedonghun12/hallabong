@@ -1,0 +1,87 @@
+package com.hallabong.diner.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hallabong.diner.mapper.DinerMapper;
+import com.hallabong.diner.mapper.ReplyMapper;
+import com.hallabong.diner.vo.ReplyVO;
+import com.webjjang.util.PageObject;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@Service
+@Log4j
+@Qualifier("replyServiceImpl")
+public class ReplyServiceImpl implements ReplyService {
+
+	@Setter(onMethod_ = { @Autowired })
+	private ReplyMapper mapper;
+
+	@Setter(onMethod_ = { @Autowired })
+	private DinerMapper dinerMapper;
+
+	// 리뷰 리스트
+	@Override
+	public List<ReplyVO> getList(PageObject pageObject, Long no) {
+		// TODO Auto-generated method stub
+		log.info("get Reply List of a Diner - no : " + no);
+
+		pageObject.setTotalRow(mapper.getCountByNo(no));
+
+		return mapper.getListWithPaging(pageObject, no);
+	}
+
+	// 리뷰 등록
+	@Transactional
+	@Override
+	public int register(ReplyVO vo) {
+		// TODO Auto-generated method stub
+		log.info("register ... vo : " + vo);
+
+		dinerMapper.updateReplyCnt(vo.getNo(), 1);
+
+		return mapper.insert(vo);
+	}
+
+	// 리뷰 수정
+	@Override
+	public int modify(ReplyVO vo) {
+		// TODO Auto-generated method stub
+		log.info("modify ... vo : " + vo);
+
+		return mapper.update(vo);
+	}
+
+	// 리뷰 삭제
+	@Transactional
+	@Override
+	public int remove(Long rno) {
+		// TODO Auto-generated method stub
+		log.info("remove ... rno : " + rno);
+
+		ReplyVO vo = mapper.read(rno);
+
+		dinerMapper.updateReplyCnt(vo.getNo(), -1);
+
+		return mapper.delete(rno);
+	}
+
+	// 리뷰 조회
+	@Override
+	public ReplyVO get(Long rno) {
+		// TODO Auto-generated method stub
+
+		log.info("get..............." + rno);
+
+		return mapper.read(rno);
+
+	}
+
+}

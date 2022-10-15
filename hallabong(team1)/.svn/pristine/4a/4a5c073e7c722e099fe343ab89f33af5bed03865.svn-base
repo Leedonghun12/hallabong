@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hallabong.hotelbooking.mapper.HotelBookingMapper">
+	<!-- 	// list -->
+	<select id="list" resultType="com.hallabong.hotelbooking.vo.HotelBookingVO">
+	<![CDATA[
+		select hbno, id, ro_no, ro_name, ro_people, progress, area,checkin, checkout
+		from(
+            select 
+            /*+ INDEX_DESC(hotel_booking_hbno_pk)*/
+            rownum rnum, hb.hbno, hb.id, hb.ro_no, ro.ro_name , ro.ro_people, hb.progress, b.area,
+              hbd.checkin, hbd.checkout
+             from  hotel_booking hb, room ro, member m , business b, hotel_booking_date hbd
+            where rownum <= #{endRow}
+                and (hb.id = m.id and hb.ro_no = ro.ro_no and b.no = ro.no
+                    and hb.hbno = hbd.hbno) 
+		)
+		where rnum >= #{startRow}
+		]]>
+		
+		<!-- where #{endRow} -->
+	</select>
+	
+	<select id="getTotalRow" resultType="Long" >
+		select 
+		count(*)
+		from hotel_booking 
+	</select>
+
+	
+	
+	<!-- 	// view -->
+	<select id="view" resultType="com.hallabong.hotelbooking.vo.HotelBookingVO">
+		 select hb.hbno, m.id, m.name, m.tel, m.email, 
+		hb.userName, hb.userTel, hb.userEmail, hb.payOption, hb.payDay, 
+        hb.payType, hb.confirmNo,
+		hb.bookingDate, hb.progress, ro.ro_no,
+		ro.ro_name, ro.ro_price, ro.ro_people, hbd.checkin, hbd.checkout,
+		b.area 
+		from hotel_booking hb, member m, room ro, business b, hotel_booking_date hbd 
+		where hb.hbno = #{hbno}
+		and (ro.ro_no = hb.ro_no and hb.hbno = hbd.hbno and b.no = ro.no and m.id= hb.id) 
+	</select>
+	
+	<!-- 	// write처리 -->
+	<insert id="write">
+		insert into hotel_booking(hbno, userName, userTel, userEmail, payOption, payType, confirmNo)
+		values(hotel_booking_seq.nextval,  #{userName}, #{userTel}, #{userEmail},#{payOption},#{payType},
+		#{confirmNo}) 
+	</insert>
+	<insert id="insertSelectKey">
+		<selectKey keyProperty="hbno" order="BEFORE" resultType="long">
+			select hotel_booking_seqnextval from dual
+		</selectKey>
+		
+		insert into hotel_booking(hbno, userName, userTel, userEmail, payOption, payType, confirmNo)
+		values (#{hbno},  #{userName}, #{userTel}, #{userEmail},#{payOption},#{payType},
+		#{confirmNo})
+	</insert>
+	
+	
+	
+	<!-- 	// update처리 -->
+	<update id="update">
+		update hotel_booking set userName = #{userName}, userTel = #{userTel}, userEmail = #{userEmail}
+		
+		where hbno = #{hbno}
+	</update>
+	<!-- 	// delete 처리 -->
+	<delete id="delete">
+		delete from hotel_booking
+		where hbno = #{hbno}
+	</delete>
+
+</mapper>

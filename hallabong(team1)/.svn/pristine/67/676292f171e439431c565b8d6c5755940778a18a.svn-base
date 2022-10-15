@@ -1,0 +1,54 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<title>이번달 달력</title>
+	<script type="text/javascript">
+	// 현재 날짜 객체를 생성 - 년, 월 , 일을 변수에 저장
+	var date = new Date();
+	var y = date.getFullYear();
+	var m = date.getMonth();
+	var d = date.getDate();
+	// alert(y+"-"+(m+1)+"-"+d);
+	
+	// 현재 달의 1일에 해당되는 날짜 객체 생성 -> 요일을 구한다. -> 달력의 빈공의 갯수를 구하기 위해서
+	var startDate = new Date(y,m,1);
+	var startDay = startDate.getDay();
+	
+	// 현재 달의 마지막날에 해당되는 날짜 객체 생성 -> 날짜의 반복 횟수
+	var endDate = new Date(y,m+1,0);
+	var lastDate = endDate.getDate();
+	// alert("1일의 요일:"+startDay+",마자막 날짜:"+lastDate);
+	
+	//현재 년도와 월을 출력
+	document.write("<div class='row'><h1>",y,".",m+1,"</h1>");
+	
+	// 테이블 출력 시작
+	document.write("<table border='1'>");
+	// 테이블의 요일 출력
+	document.write("<tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>");
+	document.write("<tr>");
+	
+	// 1일의 요일(startDay)은 4 : 0-3빈칸을 만든다.
+	for(var i=0; i<startDay;i++)
+	 document.write("<td>&nbsp;</td>");
+	 
+	// 출력한 칸을 세는 변수 -> 7의 배수이면 새로운 줄을 만든다.(</tr><tr>)
+	var colCnt = startDay;
+	
+	//1-마지막날(lastDate) 까지 출력하는 반복문
+	for(var i=1;i<=lastDate;i++){
+	 document.write("<td>",i,"</td>");
+	 colCnt++;
+	 // colCnt가 7의 배수이면 새로운 줄은 만든다.(</tr><tr>)
+	 if(colCnt % 7 == 0)
+	  document.write("</tr><tr>");
+	}
+	
+	// 마지막 날 뒤에 빈칸 채우기
+	while(colCnt % 7 != 0){
+	 document.write("<td>&nbsp;</td>");
+	 colCnt++;
+	}
+	 
+	document.write("</tr></table></div>")
+	</script>
